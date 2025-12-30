@@ -27,8 +27,13 @@ const App = () => {
         setSelected(Math.floor(Math.random() * anecdotes.length))
     }
 
+    const mostVoted = votes.reduce((acc, curr, idx) => {
+        return curr > acc.value ? { value: curr, index: idx } : acc;
+    }, { value: votes[0], index: 0 });
+
     return (
         <div>
+            <h1>Anecdote of the day</h1>
             {anecdotes[selected]}
             <p>
                 has {votes[selected]} votes
@@ -36,6 +41,11 @@ const App = () => {
             <p>
                 <Button onClick={handleVoteClick} text='vote' />
                 <Button onClick={handleNextClick} text='next anecdote' />
+            </p>
+            <h1>Anecdote with most votes</h1>
+            {anecdotes[mostVoted.index]}
+            <p>
+                has {mostVoted.value} votes
             </p>
         </div>
     )
