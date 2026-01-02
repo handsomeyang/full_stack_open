@@ -54,24 +54,34 @@ app.delete('/api/persons/:id', (request, response) => {
 })
 
 const generateId = () => {
-    const maxId = persons.length > 0
-        ? Math.max(...persons.map(n => Number(n.id)))
-        : 0
-    return String(maxId + 1)
+    let id;
+    existingSet = new Set(persons.map(person => person.id))
+
+    do {
+        id = Math.floor(Math.random() * 1000000) + 1;
+    } while (existingSet.has(id));
+
+    return id;
 }
 
 app.post('/api/persons', (request, response) => {
     const body = request.body
 
-    if (!body.name) {
+    if (!body.name || !body.number) {
         return response.status(400).json({
-            error: 'Name missing'
+            error: 'Name or number missing'
+        })
+    }
+
+    if (persons.some(person => person.name === body.name)) {
+        return response.status(400).json({
+            error: 'Name already exists in the phonebook'
         })
     }
 
     const person = {
         name: body.name,
-        number: body.number || '',
+        number: body.number,
         id: generateId(),
     }
 
