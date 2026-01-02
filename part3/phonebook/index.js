@@ -2,6 +2,7 @@ const express = require('express')
 const app = express()
 
 app.use(express.json())
+app.set('view engine', 'ejs');
 
 let persons = [
     {
@@ -77,6 +78,29 @@ app.post('/api/persons', (request, response) => {
     persons = persons.concat(person)
 
     response.json(person)
+})
+
+app.get('/info', (request, response) => {
+    const now = new Date();
+
+    // Create a formatter with detailed options
+    const formatter = new Intl.DateTimeFormat('en-US', {
+        weekday: 'long',    // "Friday"
+        year: 'numeric',    // "2026"
+        month: 'long',      // "January"
+        day: 'numeric',     // "2"
+        hour: '2-digit',    // "09"
+        minute: '2-digit',  // "08"
+        second: '2-digit',  // "34"
+        timeZoneName: 'long' // "EST" or "GMT-5"
+    });
+
+    const data = {
+        personCount: persons.length,
+        requestTime: formatter.format(now)
+    };
+
+    response.render('info', data);
 })
 
 const PORT = 3001
