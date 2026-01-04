@@ -57,6 +57,8 @@ const App = () => {
                         }, 3000)
                     })
                     .catch(error => {
+                        console.log(error.response.data.error)
+
                         setNewName('')
                         setNewNumber('')
                         setMessage(
@@ -81,10 +83,12 @@ const App = () => {
                     }, 3000)
                 })
                 .catch(error => {
+                    console.log(error.response.data.error)
+
                     setNewName('')
                     setNewNumber('')
                     setMessage(
-                        {content: `Error adding ${newName}`, error: true}
+                        {content: error.response.data.error, error: true}
                     )
                     setTimeout(() => {
                         setMessage(null)
