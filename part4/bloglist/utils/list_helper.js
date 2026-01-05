@@ -27,9 +27,22 @@ const mostBlogs = (blogs) => {
       .countBy('author')
       .map((val, key) => ({
         author: key,
-        blogs: val // <--- Custom name defined here
+        blogs: val
       }))
-      .maxBy('blogs') // <--- Must match the custom name above
+      .maxBy('blogs')
+      .value()
+}
+
+const mostLikes = (blogs) => {
+  return blogs.length === 0
+    ? null
+    : _.chain(blogs)
+      .groupBy('author')
+      .map((authorBlogs, name) => ({
+        author: name,
+        likes: _.sumBy(authorBlogs, 'likes')
+      }))
+      .maxBy('likes')
       .value()
 }
 
@@ -37,5 +50,6 @@ module.exports = {
   dummy,
   totalLikes,
   favoriteBlog,
-  mostBlogs
+  mostBlogs,
+  mostLikes
 }
