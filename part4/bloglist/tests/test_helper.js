@@ -52,7 +52,12 @@ const initialBlogs = [
 ]
 
 const nonExistingId = async () => {
-  const blog = new Blog(initialBlogs[0])
+  const blog = new Blog({
+    title: 'Testing the backend',
+    author: 'University of Helsinki',
+    url: 'https://fullstackopen.com/en/part4/testing_the_backend',
+    likes: 100
+  })
   await blog.save()
   await blog.deleteOne()
 
