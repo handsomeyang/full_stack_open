@@ -5,15 +5,15 @@ const User = require('../models/user')
 
 blogsRouter.get('/', async (request, response) => {
   const blogs = await Blog.find({}).populate('user', { username: 1, name: 1 })
-  response.json(blogs)
+  return response.json(blogs)
 })
 
 blogsRouter.get('/:id', async (request, response) => {
   const blog = await Blog.findById(request.params.id)
   if (blog) {
-    response.json(blog)
+    return response.json(blog)
   } else {
-    response.status(404).end()
+    return response.status(404).end()
   }
 })
 
@@ -23,7 +23,7 @@ blogsRouter.post('/', async (request, response) => {
   const user = request.user
 
   if (!user) {
-    return response.status(400).json({ error: 'userId missing or not valid' })
+    return response.status(401).json({ error: 'userId missing or not valid' })
   }
 
   const blog = new Blog({
@@ -38,7 +38,7 @@ blogsRouter.post('/', async (request, response) => {
   user.blogs = user.blogs.concat(savedBlog._id)
   await user.save()
 
-  response.status(201).json(savedBlog)
+  return response.status(201).json(savedBlog)
 })
 
 blogsRouter.delete('/:id', async (request, response) => {
@@ -48,9 +48,9 @@ blogsRouter.delete('/:id', async (request, response) => {
 
   if ( blog.user.toString() === user.id.toString() ) {
     await Blog.findByIdAndDelete(request.params.id)
-    response.status(204).end()
+    return response.status(204).end()
   } else {
-    response.status(401).json({ error: 'user is not the creator of the blog' })
+    return response.status(401).json({ error: 'user is not the creator of the blog' })
   }
 })
 
@@ -66,9 +66,9 @@ blogsRouter.put('/:id', async (request, response) => {
     blog.likes = likes
 
     const savedBlog = await blog.save()
-    response.json(savedBlog)
+    return response.json(savedBlog)
   } else {
-    response.status(404).end()
+    return response.status(404).end()
   }
 })
 

@@ -2,19 +2,31 @@ const { test, after, beforeEach, describe } = require('node:test')
 const assert = require('node:assert')
 const mongoose = require('mongoose')
 const supertest = require('supertest')
+const jwt = require('jsonwebtoken')
+const bcrypt = require('bcrypt')
 const app = require('../app')
 const helper = require('./test_helper')
 const Blog = require('../models/blog')
+const User = require('../models/user')
 
 const api = supertest(app)
 
 describe('when there is initially some blogs saved', () => {
   beforeEach(async () => {
     await Blog.deleteMany({})
-    console.log('cleared')
+    console.log('cleared blogs')
 
     await Blog.insertMany(helper.initialBlogs)
-    console.log('done')
+    console.log('initiated blogs')
+
+    await User.deleteMany({})
+    console.log('cleared users')
+
+    const passwordHash = await bcrypt.hash('sekret', 10)
+    const user = new User({ username: 'root', passwordHash })
+
+    await user.save()
+    console.log('initiated users')
   })
 
   describe('viewing all blogs', () => {
@@ -83,8 +95,17 @@ describe('when there is initially some blogs saved', () => {
         likes: 100,
       }
 
+      const usersAtStart = await helper.usersInDb()
+      const user = usersAtStart[0]
+      const userForToken = {
+        username: user.username,
+        id: user.id,
+      }
+      const token = jwt.sign(userForToken, process.env.SECRET, { expiresIn: 60*60 })
+
       await api
         .post('/api/blogs')
+        .set('Authorization', `Bearer ${token}`)
         .send(newBlog)
         .expect(201)
         .expect('Content-Type', /application\/json/)
@@ -103,8 +124,17 @@ describe('when there is initially some blogs saved', () => {
         url: 'https://fullstackopen.com/en/part4/testing_the_backend'
       }
 
+      const usersAtStart = await helper.usersInDb()
+      const user = usersAtStart[0]
+      const userForToken = {
+        username: user.username,
+        id: user.id,
+      }
+      const token = jwt.sign(userForToken, process.env.SECRET, { expiresIn: 60*60 })
+
       const response = await api
         .post('/api/blogs')
+        .set('Authorization', `Bearer ${token}`)
         .send(newBlog)
 
       assert.strictEqual(response.body.likes, 0)
@@ -119,10 +149,37 @@ describe('when there is initially some blogs saved', () => {
         author: 'University of Helsinki'
       }
 
+      const usersAtStart = await helper.usersInDb()
+      const user = usersAtStart[0]
+      const userForToken = {
+        username: user.username,
+        id: user.id,
+      }
+      const token = jwt.sign(userForToken, process.env.SECRET, { expiresIn: 60*60 })
+
+      await api
+        .post('/api/blogs')
+        .set('Authorization', `Bearer ${token}`)
+        .send(newBlog)
+        .expect(400)
+
+      const blogsAtEnd = await helper.blogsInDb()
+      assert.strictEqual(blogsAtEnd.length, helper.initialBlogs.length)
+    })
+
+    test('adding a valid blog without token returns status code 401', async () => {
+      const newBlog = {
+        title: 'Testing the backend',
+        author: 'University of Helsinki',
+        url: 'https://fullstackopen.com/en/part4/testing_the_backend',
+        likes: 100,
+      }
+
       await api
         .post('/api/blogs')
         .send(newBlog)
-        .expect(400)
+        .expect(401)
+        .expect('Content-Type', /application\/json/)
 
       const blogsAtEnd = await helper.blogsInDb()
       assert.strictEqual(blogsAtEnd.length, helper.initialBlogs.length)
