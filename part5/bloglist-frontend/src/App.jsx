@@ -132,6 +132,26 @@ const App = () => {
       })
   }
 
+  const removeBlogOf = async blog => {
+    if (window.confirm(`Remove blog ${blog.title} by ${blog.author}?`)) {
+
+      try {
+        await blogService.remove(blog.id)
+        setBlogs(blogs.filter(n => n.id !== blog.id))
+
+        setErrorMessage({content: `Blog ${blog.title} by ${blog.author} removed`, error: false})
+        setTimeout(() => {
+          setErrorMessage(null)
+        }, 5000)
+      } catch (error) {
+        setErrorMessage({content: error.response.data.error, error: true})
+        setTimeout(() => {
+          setErrorMessage(null)
+        }, 5000)
+      }
+    }
+  }
+
   return (
     <div>
       <Notification message={errorMessage}/>
@@ -143,7 +163,7 @@ const App = () => {
           <p>{user.name} logged in <button onClick={handleLogout}>logout</button></p>
           {blogForm()}
           {blogs.map(blog =>
-            <Blog key={blog.id} blog={blog} bumpLikes={() => bumpLikesOf(blog.id)}/>
+            <Blog key={blog.id} blog={blog} user={user} bumpLikes={() => bumpLikesOf(blog.id)} removeBlog={() => removeBlogOf(blog)} />
           )}
         </div>
       )}
