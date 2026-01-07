@@ -42,6 +42,11 @@ const App = () => {
       blogService.setToken(user.token)
       setUsername('')
       setPassword('')
+
+      setErrorMessage({content: `${user.name} logged in`, error: false})
+      setTimeout(() => {
+        setErrorMessage(null)
+      }, 5000)
     } catch {
       setErrorMessage({content: 'wrong credentials', error: true})
       setTimeout(() => {
@@ -51,9 +56,21 @@ const App = () => {
   }
 
   const handleLogout = () => {
-    window.localStorage.removeItem('loggedBlogappUser')
-    setUser(null)
-    blogService.setToken(null)
+    try {
+      setErrorMessage({content: `${user.name} logged out`, error: false})
+      setTimeout(() => {
+        setErrorMessage(null)
+      }, 5000)
+
+      window.localStorage.removeItem('loggedBlogappUser')
+      setUser(null)
+      blogService.setToken(null)
+    } catch {
+      setErrorMessage({content: `error logging out ${user.name}`, error: true})
+      setTimeout(() => {
+        setErrorMessage(null)
+      }, 5000)
+    }
   }
 
   const handleCreation = async (event) => {
@@ -72,6 +89,11 @@ const App = () => {
       setNewTitle('')
       setNewAuthor('')
       setNewUrl('')
+
+      setErrorMessage({content: `A new blog ${returnedBlog.title} by ${returnedBlog.author} added`, error: false})
+      setTimeout(() => {
+        setErrorMessage(null)
+      }, 5000)
     } catch (error) {
       setErrorMessage({content: error.response.data.error, error: true})
       setTimeout(() => {
