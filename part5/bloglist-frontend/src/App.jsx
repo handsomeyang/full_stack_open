@@ -9,6 +9,9 @@ const App = () => {
   const [errorMessage, setErrorMessage] = useState(null)
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
+  const [newTitle, setNewTitle] = useState('')
+  const [newAuthor, setNewAuthor] = useState('')
+  const [newUlr, setNewUrl] = useState('')
   const [user, setUser] = useState(null)
 
   useEffect(() => {
@@ -40,7 +43,7 @@ const App = () => {
       setUsername('')
       setPassword('')
     } catch {
-      setErrorMessage({ content: 'wrong credentials', error: true })
+      setErrorMessage({content: 'wrong credentials', error: true})
       setTimeout(() => {
         setErrorMessage(null)
       }, 5000)
@@ -51,6 +54,30 @@ const App = () => {
     window.localStorage.removeItem('loggedBlogappUser')
     setUser(null)
     blogService.setToken(null)
+  }
+
+  const handleCreation = async (event) => {
+    event.preventDefault()
+
+    const blogObject = {
+      title: newTitle,
+      author: newAuthor,
+      url: newUlr
+    }
+
+    try {
+      const returnedBlog = await blogService.create(blogObject)
+
+      setBlogs(blogs.concat(returnedBlog))
+      setNewTitle('')
+      setNewAuthor('')
+      setNewUrl('')
+    } catch (error) {
+      setErrorMessage({content: error.response.data.error, error: true})
+      setTimeout(() => {
+        setErrorMessage(null)
+      }, 5000)
+    }
   }
 
   const loginForm = () => (
@@ -82,6 +109,45 @@ const App = () => {
     </div>
   )
 
+  const blogForm = () => (
+    <div>
+      <h2>Create a new blog</h2>
+      <form onSubmit={handleCreation}>
+        <div>
+          <label>
+            title
+            <input
+              type="text"
+              value={newTitle}
+              onChange={({target}) => setNewTitle(target.value)}
+            />
+          </label>
+        </div>
+        <div>
+          <label>
+            author
+            <input
+              type="text"
+              value={newAuthor}
+              onChange={({target}) => setNewAuthor(target.value)}
+            />
+          </label>
+        </div>
+        <div>
+          <label>
+            url
+            <input
+              type="text"
+              value={newUlr}
+              onChange={({target}) => setNewUrl(target.value)}
+            />
+          </label>
+        </div>
+        <button type="submit">create</button>
+      </form>
+    </div>
+  )
+
   return (
     <div>
       <Notification message={errorMessage}/>
@@ -91,6 +157,7 @@ const App = () => {
         <div>
           <h2>Blogs</h2>
           <p>{user.name} logged in <button onClick={handleLogout}>logout</button></p>
+          {blogForm()}
           {blogs.map(blog =>
             <Blog key={blog.id} blog={blog}/>
           )}
