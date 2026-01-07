@@ -112,6 +112,26 @@ const App = () => {
     </Togglable>
   )
 
+  const bumpLikesOf = id => {
+    const blog = blogs.find(n => n.id === id)
+    const changedBlog = {...blog, likes: blog.likes + 1}
+
+    blogService
+      .update(id, changedBlog)
+      .then(returnedBlog => {
+        setBlogs(blogs.map(blog => blog.id === id ? returnedBlog : blog))
+      })
+      .catch(() => {
+        setErrorMessage(
+          `Blog '${blog.title}' was already removed from server`
+        )
+        setTimeout(() => {
+          setErrorMessage(null)
+        }, 5000)
+        setBlogs(blogs.filter(n => n.id !== id))
+      })
+  }
+
   return (
     <div>
       <Notification message={errorMessage}/>
@@ -123,7 +143,7 @@ const App = () => {
           <p>{user.name} logged in <button onClick={handleLogout}>logout</button></p>
           {blogForm()}
           {blogs.map(blog =>
-            <Blog key={blog.id} blog={blog}/>
+            <Blog key={blog.id} blog={blog} bumpLikes={() => bumpLikesOf(blog.id)}/>
           )}
         </div>
       )}
