@@ -54,7 +54,7 @@ describe('<Blog />', () => {
     expect(likesElement).toBeVisible()
   })
 
-  test('bumpLikes is called twice if the like button is clicked twice', async ({ blog, user, bumpLikes, removeBlog }) => {
+  test('bumpLikes is called twice if the like button is clicked twice', async ({ bumpLikes }) => {
     const userSetup = userEvent.setup()
     const button = screen.getByText('like')
     await userSetup.click(button)
