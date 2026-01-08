@@ -1,6 +1,6 @@
 import { useState } from 'react'
 
-const Blog = ({blog, user, bumpLikes, removeBlog}) => {
+const Blog = ({ blog, user, bumpLikes, removeBlog }) => {
   const [visible, setVisible] = useState(false)
   const showWhenVisible = { display: visible ? '' : 'none' }
 

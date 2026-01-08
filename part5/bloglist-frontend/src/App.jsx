@@ -1,4 +1,4 @@
-import {useState, useEffect, useRef} from 'react'
+import { useState, useEffect, useRef } from 'react'
 import Blog from './components/Blog'
 import Notification from './components/Notification'
 import LoginForm from './components/LoginForm'
@@ -35,7 +35,7 @@ const App = () => {
     event.preventDefault()
 
     try {
-      const user = await loginService.login({username, password})
+      const user = await loginService.login({ username, password })
 
       window.localStorage.setItem(
         'loggedBlogappUser', JSON.stringify(user)
@@ -45,12 +45,12 @@ const App = () => {
       setUsername('')
       setPassword('')
 
-      setErrorMessage({content: `${user.name} logged in`, error: false})
+      setErrorMessage({ content: `${user.name} logged in`, error: false })
       setTimeout(() => {
         setErrorMessage(null)
       }, 5000)
     } catch {
-      setErrorMessage({content: 'wrong credentials', error: true})
+      setErrorMessage({ content: 'wrong credentials', error: true })
       setTimeout(() => {
         setErrorMessage(null)
       }, 5000)
@@ -59,7 +59,7 @@ const App = () => {
 
   const handleLogout = () => {
     try {
-      setErrorMessage({content: `${user.name} logged out`, error: false})
+      setErrorMessage({ content: `${user.name} logged out`, error: false })
       setTimeout(() => {
         setErrorMessage(null)
       }, 5000)
@@ -68,7 +68,7 @@ const App = () => {
       setUser(null)
       blogService.setToken(null)
     } catch {
-      setErrorMessage({content: `error logging out ${user.name}`, error: true})
+      setErrorMessage({ content: `error logging out ${user.name}`, error: true })
       setTimeout(() => {
         setErrorMessage(null)
       }, 5000)
@@ -82,12 +82,12 @@ const App = () => {
       const returnedBlog = await blogService.create(blogObject)
       setBlogs(blogs.concat(returnedBlog))
 
-      setErrorMessage({content: `A new blog ${returnedBlog.title} by ${returnedBlog.author} added`, error: false})
+      setErrorMessage({ content: `A new blog ${returnedBlog.title} by ${returnedBlog.author} added`, error: false })
       setTimeout(() => {
         setErrorMessage(null)
       }, 5000)
     } catch (error) {
-      setErrorMessage({content: error.response.data.error, error: true})
+      setErrorMessage({ content: error.response.data.error, error: true })
       setTimeout(() => {
         setErrorMessage(null)
       }, 5000)
@@ -114,7 +114,7 @@ const App = () => {
 
   const bumpLikesOf = id => {
     const blog = blogs.find(n => n.id === id)
-    const changedBlog = {...blog, likes: blog.likes + 1}
+    const changedBlog = { ...blog, likes: blog.likes + 1 }
 
     blogService
       .update(id, changedBlog)
@@ -139,12 +139,12 @@ const App = () => {
         await blogService.remove(blog.id)
         setBlogs(blogs.filter(n => n.id !== blog.id))
 
-        setErrorMessage({content: `Blog ${blog.title} by ${blog.author} removed`, error: false})
+        setErrorMessage({ content: `Blog ${blog.title} by ${blog.author} removed`, error: false })
         setTimeout(() => {
           setErrorMessage(null)
         }, 5000)
       } catch (error) {
-        setErrorMessage({content: error.response.data.error, error: true})
+        setErrorMessage({ content: error.response.data.error, error: true })
         setTimeout(() => {
           setErrorMessage(null)
         }, 5000)
