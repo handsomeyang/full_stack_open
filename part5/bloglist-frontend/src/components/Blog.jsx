@@ -25,7 +25,7 @@ const Blog = ({ blog, user, bumpLikes, removeBlog }) => {
       </div>
       <div style={showWhenVisible}>
         <div>{blog.url}</div>
-        <div>
+        <div className="likesCount">
           likes {blog.likes} <button onClick={bumpLikes}>like</button>
         </div>
         <div>{blog.user.name}</div>

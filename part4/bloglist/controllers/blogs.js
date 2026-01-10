@@ -1,7 +1,5 @@
-const jwt = require('jsonwebtoken')
 const blogsRouter = require('express').Router()
 const Blog = require('../models/blog')
-const User = require('../models/user')
 
 blogsRouter.get('/', async (request, response) => {
   const blogs = await Blog.find({}).populate('user', { username: 1, name: 1 })
@@ -9,7 +7,7 @@ blogsRouter.get('/', async (request, response) => {
 })
 
 blogsRouter.get('/:id', async (request, response) => {
-  const blog = await Blog.findById(request.params.id)
+  const blog = await Blog.findById(request.params.id).populate('user', { username: 1, name: 1 })
   if (blog) {
     return response.json(blog)
   } else {
@@ -35,6 +33,7 @@ blogsRouter.post('/', async (request, response) => {
   })
 
   const savedBlog = await blog.save()
+  await savedBlog.populate('user', { username: 1, name: 1 })
   user.blogs = user.blogs.concat(savedBlog._id)
   await user.save()
 
@@ -58,6 +57,8 @@ blogsRouter.put('/:id', async (request, response) => {
   const { title, author, url, likes } = request.body
 
   const blog = await Blog.findById(request.params.id)
+  console.log(request.params.id)
+  console.log(blog)
 
   if (blog) {
     blog.title = title
@@ -65,10 +66,9 @@ blogsRouter.put('/:id', async (request, response) => {
     blog.url = url
     blog.likes = likes
 
-    await blog.save()
-    const populatedBlog = await Blog.findById(request.params.id).populate('user', { username: 1, name: 1 })
-
-    return response.json(populatedBlog)
+    const savedBlog = await blog.save()
+    await savedBlog.populate('user', { username: 1, name: 1 })
+    return response.json(savedBlog)
   } else {
     return response.status(404).end()
   }

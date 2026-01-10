@@ -13,7 +13,7 @@ const Notification = ({ message }) => {
   }
 
   return (
-    <div style={{ ...baseStyle, color: message.error ? 'red' : 'green' }}>
+    <div className="notification" style={{ ...baseStyle, color: message.error ? 'red' : 'green' }}>
       {message.content}
     </div>
   )

@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, useMemo } from 'react'
 import Blog from './components/Blog'
 import Notification from './components/Notification'
 import LoginForm from './components/LoginForm'
@@ -18,9 +18,14 @@ const App = () => {
 
   useEffect(() => {
     blogService.getAll().then(blogs =>
-      setBlogs(blogs.sort((a, b) => a.likes - b.likes))
+      setBlogs(blogs)
     )
   }, [])
+
+  const sortedBlogs = useMemo(() => {
+    console.log('Re-sorting blogs')
+    return [...blogs].sort((a, b) => b.likes - a.likes)
+  }, [blogs])
 
   useEffect(() => {
     const loggedUserJSON = window.localStorage.getItem('loggedBlogappUser')
@@ -123,7 +128,7 @@ const App = () => {
       })
       .catch(() => {
         setErrorMessage(
-          `Blog '${blog.title}' was already removed from server`
+          { content: `Blog '${blog.title}' was already removed from server`, error: true }
         )
         setTimeout(() => {
           setErrorMessage(null)
@@ -162,7 +167,7 @@ const App = () => {
           <h2>Blogs</h2>
           <p>{user.name} logged in <button onClick={handleLogout}>logout</button></p>
           {blogForm()}
-          {blogs.map(blog =>
+          {sortedBlogs.map(blog =>
             <Blog key={blog.id} blog={blog} user={user} bumpLikes={() => bumpLikesOf(blog.id)} removeBlog={() => removeBlogOf(blog)} />
           )}
         </div>
