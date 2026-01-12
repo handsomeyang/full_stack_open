@@ -1,7 +1,7 @@
 import { useMemo } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { voteAnecdote } from '../reducers/anecdoteReducer'
-import {setNotification, resetNotification} from '../reducers/notificationReducer'
+import {setNotification} from '../reducers/notificationReducer'
 
 const Anecdote = ({ anecdote, handleClick }) => {
   return (
@@ -35,8 +35,7 @@ const AnecdoteList = () => {
           anecdote={anecdote}
           handleClick={() => {
             dispatch(voteAnecdote(anecdote))
-            dispatch(setNotification({content: `You voted ${anecdote.content}`, error: false}))
-            setTimeout(() => dispatch(resetNotification()), 5000)
+            dispatch(setNotification({content: `You voted ${anecdote.content}`, error: false}, 5))
           }}
         />
       ))}
